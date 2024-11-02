@@ -10,3 +10,4 @@
 node_modules/
 example-app/
 .idea/
+.DS_Store
