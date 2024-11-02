@@ -1,4 +1,4 @@
-import type { EventType, GlobalState } from "./types";
+import type { EventType, GlobalState, PanAnalytic } from "./types";
 
 export declare const window: {
     __pan: GlobalState;
@@ -36,7 +36,7 @@ if (window.__pan.mouseoverListener) {
 if (window.__pan.inertiaStartListener) {
     document.removeEventListener(
         "inertia:start",
-        window.__pan.inertiaStartListener
+        window.__pan.inertiaStartListener,
     );
 
     window.__pan.inertiaStartListener = null;
@@ -55,11 +55,11 @@ if (window.__pan.inertiaStartListener) {
         window.__pan.observer = observer;
     };
 
-    let queue: Array<{ type: EventType; name: string }> = [];
+    let queue: Array<{ type: EventType } & PanAnalytic> = [];
     let queueTimeout: number | null = null;
-    let impressed: Array<string> = [];
-    let hovered: Array<string> = [];
-    let clicked: Array<string> = [];
+    let impressed: Array<PanAnalytic> = [];
+    let hovered: Array<PanAnalytic> = [];
+    let clicked: Array<PanAnalytic> = [];
 
     const commit = (): void => {
         if (queue.length === 0) {
@@ -81,8 +81,8 @@ if (window.__pan.inertiaStartListener) {
                 ],
                 {
                     type: "application/json",
-                }
-            )
+                },
+            ),
         );
     };
 
@@ -102,30 +102,38 @@ if (window.__pan.inertiaStartListener) {
         }
 
         const name = element.getAttribute("data-pan");
+        const description = element.getAttribute("data-pan-description");
 
         if (name === null) {
             return;
         }
 
         if (event === "hover") {
-            if (hovered.includes(name)) {
+            if (hovered.some((analytic) => analytic.name === name)) {
                 return;
             }
 
-            hovered.push(name);
+            hovered.push({
+                name,
+                description,
+            });
         }
 
         if (event === "click") {
-            if (clicked.includes(name)) {
+            if (clicked.some((analytic) => analytic.name === name)) {
                 return;
             }
 
-            clicked.push(name);
+            clicked.push({
+                name,
+                description,
+            });
         }
 
         queue.push({
             type: event,
             name: name,
+            description: description,
         });
 
         queueCommit();
@@ -143,20 +151,25 @@ if (window.__pan.inertiaStartListener) {
             }
 
             const name = element.getAttribute("data-pan");
+            const description = element.getAttribute("data-pan-description");
 
             if (name === null) {
                 return;
             }
 
-            if (impressed.includes(name)) {
+            if (impressed.some((analytic) => analytic.name === name)) {
                 return;
             }
 
-            impressed.push(name);
+            impressed.push({
+                name,
+                description,
+            });
 
             queue.push({
                 type: "impression",
                 name: name,
+                description: description,
             });
         });
 
@@ -164,15 +177,15 @@ if (window.__pan.inertiaStartListener) {
     };
 
     domObserver(function (): void {
-        impressed.forEach((name: string): void => {
+        impressed.forEach(({ name }): void => {
             const element = document.querySelector(`[data-pan='${name}']`);
 
             if (element === null) {
                 impressed = impressed.filter(
-                    (n: string): boolean => n !== name
+                    ({ name: n }): boolean => n !== name,
                 );
-                hovered = hovered.filter((n: string): boolean => n !== name);
-                clicked = clicked.filter((n: string): boolean => n !== name);
+                hovered = hovered.filter(({ name: n }): boolean => n !== name);
+                clicked = clicked.filter(({ name: n }): boolean => n !== name);
             }
         });
 
@@ -196,7 +209,7 @@ if (window.__pan.inertiaStartListener) {
 
     document.addEventListener(
         "inertia:start",
-        window.__pan.inertiaStartListener
+        window.__pan.inertiaStartListener,
     );
 
     window.__pan.beforeUnloadListener = function (event: Event): void {

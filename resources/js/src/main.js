@@ -1,13 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.window.__pan = exports.window.__pan || {
-    csrfToken: "%_PAN_CSRF_TOKEN_%",
-    routePrefix: "%_PAN_ROUTE_PREFIX_%",
-    observer: null,
-    clickListener: null,
-    mouseoverListener: null,
-    inertiaStartListener: null,
-};
+exports.window.__pan =
+    exports.window.__pan ||
+        {
+            csrfToken: "%_PAN_CSRF_TOKEN_%",
+            routePrefix: "%_PAN_ROUTE_PREFIX_%",
+            observer: null,
+            clickListener: null,
+            mouseoverListener: null,
+            inertiaStartListener: null,
+        };
 if (exports.window.__pan.observer) {
     exports.window.__pan.observer.disconnect();
     exports.window.__pan.observer = null;
@@ -17,17 +19,11 @@ if (exports.window.__pan.clickListener) {
     exports.window.__pan.clickListener = null;
 }
 if (exports.window.__pan.mouseoverListener) {
-    document.removeEventListener(
-        "mouseover",
-        exports.window.__pan.mouseoverListener
-    );
+    document.removeEventListener("mouseover", exports.window.__pan.mouseoverListener);
     exports.window.__pan.mouseoverListener = null;
 }
 if (exports.window.__pan.inertiaStartListener) {
-    document.removeEventListener(
-        "inertia:start",
-        exports.window.__pan.inertiaStartListener
-    );
+    document.removeEventListener("inertia:start", exports.window.__pan.inertiaStartListener);
     exports.window.__pan.inertiaStartListener = null;
 }
 (function () {
@@ -51,20 +47,14 @@ if (exports.window.__pan.inertiaStartListener) {
         }
         var onGoingQueue = queue.slice();
         queue = [];
-        navigator.sendBeacon(
-            "/".concat(exports.window.__pan.routePrefix, "/events"),
-            new Blob(
-                [
-                    JSON.stringify({
-                        events: onGoingQueue,
-                        _token: exports.window.__pan.csrfToken,
-                    }),
-                ],
-                {
-                    type: "application/json",
-                }
-            )
-        );
+        navigator.sendBeacon("/".concat(exports.window.__pan.routePrefix, "/events"), new Blob([
+            JSON.stringify({
+                events: onGoingQueue,
+                _token: exports.window.__pan.csrfToken,
+            }),
+        ], {
+            type: "application/json",
+        }));
     };
     var queueCommit = function () {
         queueTimeout && clearTimeout(queueTimeout);
@@ -78,99 +68,101 @@ if (exports.window.__pan.inertiaStartListener) {
             return;
         }
         var name = element.getAttribute("data-pan");
+        var description = element.getAttribute("data-pan-description");
         if (name === null) {
             return;
         }
         if (event === "hover") {
-            if (hovered.includes(name)) {
+            if (hovered.some(function (analytic) { return analytic.name === name; })) {
                 return;
             }
-            hovered.push(name);
+            hovered.push({
+                name: name,
+                description: description,
+            });
         }
         if (event === "click") {
-            if (clicked.includes(name)) {
+            if (clicked.some(function (analytic) { return analytic.name === name; })) {
                 return;
             }
-            clicked.push(name);
+            clicked.push({
+                name: name,
+                description: description,
+            });
         }
         queue.push({
             type: event,
             name: name,
+            description: description,
         });
         queueCommit();
     };
     var detectImpressions = function () {
         var elementsBeingImpressed = document.querySelectorAll("[data-pan]");
         elementsBeingImpressed.forEach(function (element) {
-            if (
-                element.checkVisibility !== undefined &&
-                !element.checkVisibility()
-            ) {
+            if (element.checkVisibility !== undefined &&
+                !element.checkVisibility()) {
                 return;
             }
             var name = element.getAttribute("data-pan");
+            var description = element.getAttribute("data-pan-description");
             if (name === null) {
                 return;
             }
-            if (impressed.includes(name)) {
+            if (impressed.some(function (analytic) { return analytic.name === name; })) {
                 return;
             }
-            impressed.push(name);
+            impressed.push({
+                name: name,
+                description: description,
+            });
             queue.push({
                 type: "impression",
                 name: name,
+                description: description,
             });
         });
         queueCommit();
     };
     domObserver(function () {
-        impressed.forEach(function (name) {
-            var element = document.querySelector(
-                "[data-pan='".concat(name, "']")
-            );
+        impressed.forEach(function (_a) {
+            var name = _a.name;
+            var element = document.querySelector("[data-pan='".concat(name, "']"));
             if (element === null) {
-                impressed = impressed.filter(function (n) {
+                impressed = impressed.filter(function (_a) {
+                    var n = _a.name;
                     return n !== name;
                 });
-                hovered = hovered.filter(function (n) {
+                hovered = hovered.filter(function (_a) {
+                    var n = _a.name;
                     return n !== name;
                 });
-                clicked = clicked.filter(function (n) {
+                clicked = clicked.filter(function (_a) {
+                    var n = _a.name;
                     return n !== name;
                 });
             }
         });
         detectImpressions();
     });
-    exports.window.__pan.clickListener = function (event) {
-        return send(event, "click");
-    };
+    exports.window.__pan.clickListener = function (event) { return send(event, "click"); };
     document.addEventListener("click", exports.window.__pan.clickListener);
     exports.window.__pan.mouseoverListener = function (event) {
         return send(event, "hover");
     };
-    document.addEventListener(
-        "mouseover",
-        exports.window.__pan.mouseoverListener
-    );
+    document.addEventListener("mouseover", exports.window.__pan.mouseoverListener);
     exports.window.__pan.inertiaStartListener = function (event) {
         impressed = [];
         hovered = [];
         clicked = [];
         detectImpressions();
     };
-    document.addEventListener(
-        "inertia:start",
-        exports.window.__pan.inertiaStartListener
-    );
+    document.addEventListener("inertia:start", exports.window.__pan.inertiaStartListener);
     exports.window.__pan.beforeUnloadListener = function (event) {
         if (queue.length === 0) {
             return;
         }
         commit();
     };
-    exports.window.addEventListener(
-        "beforeunload",
-        exports.window.__pan.beforeUnloadListener
-    );
+    exports.window.addEventListener("beforeunload", exports.window.__pan.beforeUnloadListener);
 })();

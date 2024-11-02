@@ -59,6 +59,12 @@ final readonly class DatabaseAnalyticsRepository implements AnalyticsRepository
 
         if (DB::table('pan_analytics')->where('name', $name)->count() === 0) {
             if (DB::table('pan_analytics')->count() < $maxAnalytics) {
+                $inserting = [
+                    'name' => $name,
+                    $event->column() => 1,
+                    'description' => $description
+                ];
+
                 DB::table('pan_analytics')->insert([
                     'name' => $name,
                     $event->column() => 1,
