@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('pan_analytics', function (Blueprint $table): void {
             $table->id();
             $table->string('name');
+            $table->string('description')->nullable();
 
             $table->unsignedBigInteger('impressions')->default(0);
             $table->unsignedBigInteger('hovers')->default(0);

@@ -24,8 +24,8 @@ final readonly class CreateEvent
     /**
      * Executes the action.
      */
-    public function handle(string $name, EventType $event): void
+    public function handle(string $name, EventType $event, ?string $description = null): void
     {
-        $this->repository->increment($name, $event);
+        $this->repository->increment($name, $event, $description);
     }
 }

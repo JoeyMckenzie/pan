@@ -18,7 +18,25 @@ it('can create an analytic click event', function (): void {
     $analytics = array_map(fn (Analytic $analytic): array => $analytic->toArray(), app(AnalyticsRepository::class)->all());
 
     expect($analytics)->toBe([
-        ['id' => 1, 'name' => 'help-modal', 'impressions' => 0, 'hovers' => 0, 'clicks' => 1],
+        ['id' => 1, 'name' => 'help-modal', 'impressions' => 0, 'hovers' => 0, 'clicks' => 1, 'description' => null],
+    ]);
+});
+
+it('can create an analytic click event with an optional description', function (): void {
+    $response = $this->post('/pan/events', [
+        'events' => [[
+            'name' => 'help-modal',
+            'type' => 'click',
+            'description' => 'Helpful Modal Description',
+        ]],
+    ]);
+
+    $response->assertStatus(204);
+
+    $analytics = array_map(fn (Analytic $analytic): array => $analytic->toArray(), app(AnalyticsRepository::class)->all());
+
+    expect($analytics)->toBe([
+        ['id' => 1, 'name' => 'help-modal', 'impressions' => 0, 'hovers' => 0, 'clicks' => 1, 'description' => 'Helpful Modal Description'],
     ]);
 });
 
@@ -35,7 +53,25 @@ it('can create an analytic hover event', function (): void {
     $analytics = array_map(fn (Analytic $analytic): array => $analytic->toArray(), app(AnalyticsRepository::class)->all());
 
     expect($analytics)->toBe([
-        ['id' => 1, 'name' => 'help-modal', 'impressions' => 0, 'hovers' => 1, 'clicks' => 0],
+        ['id' => 1, 'name' => 'help-modal', 'impressions' => 0, 'hovers' => 1, 'clicks' => 0, 'description' => null],
+    ]);
+});
+
+it('can create an analytic hover event with an optional description', function (): void {
+    $response = $this->post('/pan/events', [
+        'events' => [[
+            'name' => 'help-modal',
+            'type' => 'hover',
+            'description' => 'Helpful Modal Description',
+        ]],
+    ]);
+
+    $response->assertStatus(204);
+
+    $analytics = array_map(fn (Analytic $analytic): array => $analytic->toArray(), app(AnalyticsRepository::class)->all());
+
+    expect($analytics)->toBe([
+        ['id' => 1, 'name' => 'help-modal', 'impressions' => 0, 'hovers' => 1, 'clicks' => 0, 'description' => 'Helpful Modal Description'],
     ]);
 });
 
@@ -52,7 +88,25 @@ it('can create an analytic impression event', function (): void {
     $analytics = array_map(fn (Analytic $analytic): array => $analytic->toArray(), app(AnalyticsRepository::class)->all());
 
     expect($analytics)->toBe([
-        ['id' => 1, 'name' => 'help-modal', 'impressions' => 1, 'hovers' => 0, 'clicks' => 0],
+        ['id' => 1, 'name' => 'help-modal', 'impressions' => 1, 'hovers' => 0, 'clicks' => 0, 'description' => null],
+    ]);
+});
+
+it('can create an analytic impression event with an optional description', function (): void {
+    $response = $this->post('/pan/events', [
+        'events' => [[
+            'name' => 'help-modal',
+            'type' => 'impression',
+            'description' => 'Helpful Modal Description',
+        ]],
+    ]);
+
+    $response->assertStatus(204);
+
+    $analytics = array_map(fn (Analytic $analytic): array => $analytic->toArray(), app(AnalyticsRepository::class)->all());
+
+    expect($analytics)->toBe([
+        ['id' => 1, 'name' => 'help-modal', 'impressions' => 1, 'hovers' => 0, 'clicks' => 0, 'description' => 'Helpful Modal Description'],
     ]);
 });
 
@@ -75,7 +129,32 @@ it('can create an analytic impression event and click event', function (): void 
     $analytics = array_map(fn (Analytic $analytic): array => $analytic->toArray(), app(AnalyticsRepository::class)->all());
 
     expect($analytics)->toBe([
-        ['id' => 1, 'name' => 'help-modal', 'impressions' => 1, 'hovers' => 0, 'clicks' => 1],
+        ['id' => 1, 'name' => 'help-modal', 'impressions' => 1, 'hovers' => 0, 'clicks' => 1, 'description' => null],
+    ]);
+});
+
+it('can create an analytic impression event and click event each with an optional description', function (): void {
+    $response = $this->post('/pan/events', [
+        'events' => [
+            [
+                'name' => 'help-modal',
+                'type' => 'impression',
+                'description' => 'Helpful Modal Description',
+            ],
+            [
+                'name' => 'help-modal',
+                'type' => 'click',
+                'description' => 'Helpful Modal Description',
+            ],
+        ],
+    ]);
+
+    $response->assertStatus(204);
+
+    $analytics = array_map(fn (Analytic $analytic): array => $analytic->toArray(), app(AnalyticsRepository::class)->all());
+
+    expect($analytics)->toBe([
+        ['id' => 1, 'name' => 'help-modal', 'impressions' => 1, 'hovers' => 0, 'clicks' => 1, 'description' => 'Helpful Modal Description'],
     ]);
 });
 
@@ -135,7 +214,7 @@ it('can create an event using a custom prefix url', function (): void {
     $analytics = array_map(fn (Analytic $analytic): array => $analytic->toArray(), app(AnalyticsRepository::class)->all());
 
     expect($analytics)->toBe([
-        ['id' => 1, 'name' => 'help-modal', 'impressions' => 1, 'hovers' => 0, 'clicks' => 0],
+        ['id' => 1, 'name' => 'help-modal', 'impressions' => 1, 'hovers' => 0, 'clicks' => 0, 'description' => null],
     ]);
 })->after(function (): void {
     PanConfiguration::routePrefix('pan');

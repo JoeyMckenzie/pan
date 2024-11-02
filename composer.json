@@ -26,10 +26,11 @@
         "laravel/framework": "<11.0.0"
     },
     "require-dev": {
-        "orchestra/testbench": "^9.5.2",
         "laravel/pint": "^1.18.1",
+        "orchestra/testbench": "^9.5.2",
         "pestphp/pest": "^3.5.1",
         "pestphp/pest-plugin-type-coverage": "^3.1.0",
+        "pestphp/pest-plugin-watch": "^3.0",
         "phpstan/phpstan": "^1.12.7",
         "rector/rector": "^1.2.8",
         "symfony/var-dumper": "^7.1.6"
@@ -67,6 +68,7 @@
         "test:lint": "pint --test",
         "test:types": "phpstan analyse --ansi",
         "test:unit": "pest --colors=always --coverage --min=100",
+        "test:watch": "pest --watch",
         "test": [
             "@test:refacto",
             "@test:lint",

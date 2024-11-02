@@ -37,6 +37,7 @@ final readonly class DatabaseAnalyticsRepository implements AnalyticsRepository
             impressions: (int) $analytic->impressions, // @phpstan-ignore-line
             hovers: (int) $analytic->hovers, // @phpstan-ignore-line
             clicks: (int) $analytic->clicks, // @phpstan-ignore-line
+            description: $analytic->description, // @phpstan-ignore-line
         ))->toArray();
 
         return $all;
@@ -45,7 +46,7 @@ final readonly class DatabaseAnalyticsRepository implements AnalyticsRepository
     /**
      * Increments the given event for the given analytic.
      */
-    public function increment(string $name, EventType $event): void
+    public function increment(string $name, EventType $event, ?string $description = null): void
     {
         [
             'allowed_analytics' => $allowedAnalytics,
@@ -58,7 +59,11 @@ final readonly class DatabaseAnalyticsRepository implements AnalyticsRepository
 
         if (DB::table('pan_analytics')->where('name', $name)->count() === 0) {
             if (DB::table('pan_analytics')->count() < $maxAnalytics) {
-                DB::table('pan_analytics')->insert(['name' => $name, $event->column() => 1]);
+                DB::table('pan_analytics')->insert([
+                    'name' => $name,
+                    $event->column() => 1,
+                    'description' => $description
+                ]);
             }
 
             return;

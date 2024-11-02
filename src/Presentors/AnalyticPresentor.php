@@ -18,9 +18,12 @@ final class AnalyticPresentor
      */
     public function present(Analytic $analytic): array
     {
+        $description = $analytic->description ?? 'No description';
+
         return [
             'id' => '<fg=gray>#'.$analytic->id.'</>',
             'name' => '<fg=gray>'.$analytic->name.'</>',
+            'description' => '<fg=gray>'.$description.'</>',
             'impressions' => $this->toHumanReadableNumber($analytic->impressions),
             'hovers' => $this->toHumanReadableNumber($analytic->hovers).' ('.$this->toHumanReadablePercentage($analytic->impressions, $analytic->hovers).')',
             'clicks' => $this->toHumanReadableNumber($analytic->clicks).' ('.$this->toHumanReadablePercentage($analytic->impressions, $analytic->clicks).')',

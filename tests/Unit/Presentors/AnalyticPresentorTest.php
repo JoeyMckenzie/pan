@@ -13,6 +13,24 @@ it('present an analytic', function (): void {
     expect($rows)->toBe([
         'id' => '#1',
         'name' => 'help-modal',
+        'description'=> 'No description',
+        'impressions' => '1',
+        'hovers' => '1 (100.0%)',
+        'clicks' => '1 (100.0%)',
+    ]);
+});
+
+it('present an analytic with an optional description', function (): void {
+    $analytic = new Analytic(1, 'help-modal', 1, 1, 1, 'Helpful Modal Description');
+
+    $presentor = new AnalyticPresentor;
+
+    $rows = array_map(fn ($value): string => strip_tags($value), $presentor->present($analytic));
+
+    expect($rows)->toBe([
+        'id' => '#1',
+        'name' => 'help-modal',
+        'description'=> 'Helpful Modal Description',
         'impressions' => '1',
         'hovers' => '1 (100.0%)',
         'clicks' => '1 (100.0%)',
@@ -29,6 +47,7 @@ it('present an analytic with 0 impressions', function (): void {
     expect($rows)->toBe([
         'id' => '#1',
         'name' => 'help-modal',
+        'description'=> 'No description',
         'impressions' => '0',
         'hovers' => '1 (Infinity%)',
         'clicks' => '1 (Infinity%)',
@@ -45,6 +64,7 @@ it('present an analytic with 0 hovers', function (): void {
     expect($rows)->toBe([
         'id' => '#1',
         'name' => 'help-modal',
+        'description'=> 'No description',
         'impressions' => '1',
         'hovers' => '0 (0.0%)',
         'clicks' => '1 (100.0%)',
@@ -61,6 +81,7 @@ it('present an analytic with 0 clicks', function (): void {
     expect($rows)->toBe([
         'id' => '#1',
         'name' => 'help-modal',
+        'description'=> 'No description',
         'impressions' => '1',
         'hovers' => '1 (100.0%)',
         'clicks' => '0 (0.0%)',
@@ -77,6 +98,7 @@ it('presents huge numbers', function (): void {
     expect($rows)->toBe([
         'id' => '#1',
         'name' => 'help-modal',
+        'description'=> 'No description',
         'impressions' => '1,000,000',
         'hovers' => '1,000,000 (100.0%)',
         'clicks' => '1,000,000 (100.0%)',
@@ -93,6 +115,7 @@ it('presents huge numbers with 0 impressions', function (): void {
     expect($rows)->toBe([
         'id' => '#1',
         'name' => 'help-modal',
+        'description'=> 'No description',
         'impressions' => '0',
         'hovers' => '1,000,000 (Infinity%)',
         'clicks' => '1,000,000 (Infinity%)',

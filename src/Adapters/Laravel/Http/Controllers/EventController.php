@@ -20,10 +20,10 @@ final readonly class EventController
      */
     public function store(CreateEventRequest $request, CreateEvent $action): Response
     {
-        /** @var Collection<int, array{name: string, type: string}> $events */
+        /** @var Collection<int, array{name: string, type: string, description: ?string}> $events */
         $events = $request->collect('events');
 
-        $events->each(fn (array $event) => $action->handle($event['name'], EventType::from($event['type'])));
+        $events->each(fn (array $event) => $action->handle($event['name'], EventType::from($event['type']), $event['description'] ?? null));
 
         return response()->noContent();
     }

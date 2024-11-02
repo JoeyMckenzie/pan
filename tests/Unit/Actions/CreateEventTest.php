@@ -15,6 +15,20 @@ it('increments the click event for the given analytic', function (): void {
     $analytics = array_map(fn (Analytic $analytic): array => $analytic->toArray(), app(AnalyticsRepository::class)->all());
 
     expect($analytics)->toBe([
-        ['id' => 1, 'name' => 'help-modal', 'impressions' => 0, 'hovers' => 1, 'clicks' => 2],
+        ['id' => 1, 'name' => 'help-modal', 'impressions' => 0, 'hovers' => 1, 'clicks' => 2, 'description' => null],
+    ]);
+});
+
+it('increments the click event for the given analytic when given an optional description', function (): void {
+    $action = app(CreateEvent::class);
+
+    $action->handle('help-modal', EventType::CLICK, 'Help Modal Description');
+    $action->handle('help-modal', EventType::CLICK, 'Help Modal Description');
+    $action->handle('help-modal', EventType::HOVER, 'Help Modal Description');
+
+    $analytics = array_map(fn (Analytic $analytic): array => $analytic->toArray(), app(AnalyticsRepository::class)->all());
+
+    expect($analytics)->toBe([
+        ['id' => 1, 'name' => 'help-modal', 'impressions' => 0, 'hovers' => 1, 'clicks' => 2, 'description' => 'Help Modal Description'],
     ]);
 });
